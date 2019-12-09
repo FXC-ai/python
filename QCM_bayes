@@ -5,7 +5,7 @@ Created on Mon Dec  9 21:40:18 2019
 
 @author: fx
 """
-
+# Cjoix des parametres
 question = 'Combien dura la guerre de cent ans ?'
 repA = 'A ' + '116 ans'
 repB = 'B ' + '100 ans'
@@ -15,13 +15,14 @@ right_answer = 'A'
 
 print(question + ' \n{}\n{}\n{}\n{} '.format(repA, repB, repC, repD))
 
-inputA = int(input("Réponse A : "))
-inputB = int(input("Réponse B : "))
-inputC = int(input("Réponse C : "))
-inputD = int(input("Réponse D : "))
+inputA = int(input("Réponse A : (Entre 0 et 100)"))
+inputB = int(input("Réponse B : (Entre 0 et 100)"))
+inputC = int(input("Réponse C : (Entre 0 et 100)"))
+inputD = int(input("Réponse D : (Entre 0 et 100)"))
 
 def inputCheck ():
     pass
+    #fonction à delopper pour contrôler les input user particulierement input A + B + C + D = 100
 
 reponses_user = {'A' : inputA, 'B' : inputB, 'C' : inputC, 'D' : inputD}
 
