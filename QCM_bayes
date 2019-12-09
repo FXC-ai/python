@@ -1,0 +1,42 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Dec  9 21:40:18 2019
+
+@author: fx
+"""
+
+question = 'Combien dura la guerre de cent ans ?'
+repA = 'A ' + '116 ans'
+repB = 'B ' + '100 ans'
+repC = 'C ' + '45 ans'
+repD = 'D ' + '127 ans'
+right_answer = 'A'
+
+print(question + ' \n{}\n{}\n{}\n{} '.format(repA, repB, repC, repD))
+
+inputA = int(input("Réponse A : "))
+inputB = int(input("Réponse B : "))
+inputC = int(input("Réponse C : "))
+inputD = int(input("Réponse D : "))
+
+def inputCheck ():
+    pass
+
+reponses_user = {'A' : inputA, 'B' : inputB, 'C' : inputC, 'D' : inputD}
+
+def calculPoint(reponses_user, right_answer):
+
+    reponses_correctes = {'A' : 0, 'B' : 0, 'C' : 0, 'D' : 0}
+    reponses_correctes[right_answer] = 1
+    
+    erreurA = ((reponses_user['A']/100) - reponses_correctes['A'])**2
+    erreurB = ((reponses_user['B']/100) - reponses_correctes['B'])**2
+    erreurC = ((reponses_user['C']/100) - reponses_correctes['C'])**2
+    erreurD = ((reponses_user['D']/100) - reponses_correctes['D'])**2
+    
+    return round(1 - erreurA - erreurB - erreurC - erreurD,3)
+
+resultat = calculPoint(reponses_user, right_answer)
+
+print('Votre score est de :', resultat)
