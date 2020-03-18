@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Mar 17 17:03:07 2020
+
+@author: fxc
+"""
+
+import matplotlib.pyplot as plt
+import csv
+
+data_type = {"open":1, "High":2, "low":3, "close":4, "Adj Close":5, "Volume":6}
+
+# Choix du fichier, de la durée, du type de donnée
+file_name = 'PFE.csv'
+nbr_jour = 60
+choix_data = "Adj Close"
+
+#Recuperation des données dans une liste
+with open(file_name, newline='') as csvfile :
+    spamreader = csv.reader(csvfile)
+    valeurs = list()
+
+    for r in spamreader:
+        valeurs.append(r)
+
+del valeurs[0]
+
+print('Nombre de données : {} jours / mois.'.format(len(valeurs)))
+
+#Création du graphique
+plt.style.use('seaborn-whitegrid')
+plt.clf()
+
+#Calcul du début de la période souhaité
+debut = len(valeurs) - nbr_jour
+fin = len(valeurs)
+
+#Calcul des coordonnées des points
+x3 = [elt[0] for elt in valeurs[debut:fin]]
+y3 = [float(elt[data_type[choix_data]]) for elt in valeurs[debut:fin]]
+
+#Mise en forme du graphique pour plus de lisibilité
+fig = plt.figure()
+ax = plt.axes()
+plt.plot(x3,y3)
+plt.xticks(rotation = 90)
+plt.title('{} pour fichier {}'.format(choix_data,file_name))
+
+for index, value in enumerate(y3) : 
+    ax.annotate(y3[index], (x3[index],y3[index]),rotation = 70)
