@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Mar 21 19:21:51 2020
+
+@author: fxc
+"""
+
+import string
+
+class CarreVigenere:
+    
+    
+    def __init__(self, security_key):
+        #initialisation de l'objet
+        #possibilité d'utiliser un alphabet avec un ordre de lettre différent
+        self.list_alphabet = list(string.ascii_lowercase)
+        self.msg_chiffre = ''
+        self.msg_non_chiffre = ''
+        self.security_key = security_key
+        self.matrice_chiffrement = self.creer_matrice_chiffrement()
+        
+    def creer_matrice_chiffrement (self):
+        #Création de la matrice de chiffrement selon la clé utilisée
+        self.matrice_chiffrement = list()
+        for letter in self.security_key:
+            index = self.list_alphabet.index(letter)
+            tab = self.list_alphabet[index:] + self.list_alphabet[:index]
+            self.matrice_chiffrement.append(tab)        
+        return self.matrice_chiffrement
+    
+    def chiffrer_msg(self, msg_non_chiffre):
+        #Chiffrement du message selon la matrice de chiffrement
+        for indice,letter in enumerate(msg_non_chiffre):
+            x = indice%len(self.security_key)
+            y = list(string.ascii_lowercase).index(letter)
+            self.msg_chiffre += self.matrice_chiffrement[x][y]
+        
+        return self.msg_chiffre
+    
+    def dechiffrer_msg(self, msg_chiffre):
+        #Dechiffrement du message selon la matrice de chiffrement
+        for indice, letter in enumerate(msg_chiffre):
+            x = indice%len(self.security_key)
+            y = self.matrice_chiffrement[x].index(letter)
+            self.msg_non_chiffre += self.list_alphabet[y]
+    
+        return self.msg_non_chiffre      
+        
+        
+security_key = 'coronavirus'
+carreVigenere = CarreVigenere(security_key)
+print(carreVigenere.chiffrer_msg('restonsconfinés'))
+print(carreVigenere.dechiffrer_msg('lsjivspvvfwiserr'))
