@@ -50,5 +50,5 @@ class CarreVigenere:
         
 security_key = 'coronavirus'
 carreVigenere = CarreVigenere(security_key)
-print(carreVigenere.chiffrer_msg('restonsconfinés'))
+print(carreVigenere.chiffrer_msg('restonsconfines'))
 print(carreVigenere.dechiffrer_msg('lsjivspvvfwiserr'))
