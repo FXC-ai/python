@@ -1,0 +1,119 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Mar 25 17:14:00 2020
+
+@author: fxc
+"""
+
+import random
+
+
+class Carte:
+    def __init__(self, couleur, valeur, nom=None):
+        if not nom: nom = valeur
+        self.couleur, self.valeur, self.nom = couleur, int(valeur), nom
+    def __str__(self):
+        mapping = {"carreau": "♦", "coeur": "♥", "pique": "♠", "trèfle": "♣"}
+        return f"{mapping[self.couleur]} {self.nom}"
+    def __repr__(self):
+        return f"{self.couleur}.{self.nom}"
+
+
+class JeuDeCartes:
+    def __init__(self):
+        
+        self.paquet = []
+        for couleur in ["carreau", "coeur", "pique", "trèfle"]:
+            for valeur in list(range(2,11)):
+                carte = Carte(couleur, valeur)
+                self.paquet.append(carte)
+            for (nom, valeur) in {"as": 14, "valet": 11, "dame": 12, "roi": 13}.items():
+                carte = Carte(couleur, valeur, nom)
+                self.paquet.append(carte)
+        self.melange()
+        self.position = 0
+        self.paquetPourDistribue = self.paquet.copy()
+
+    def melange(self):
+        random.shuffle(self.paquet)
+        return self.paquet
+
+    def choisitCarte(self, paquet=None):
+        carte = ""
+        if (len(self.paquetPourDistribue) > 0):
+            carte = self.paquetPourDistribue.pop(random.randrange(len(self.paquetPourDistribue)))
+        return carte
+    
+    def __str__(self):
+        result = ''
+        for c in self.paquet:
+            result += c.__str__() + '\n'
+        return result
+
+    def __iter__(self):
+        return iter(self.paquet)
+
+    def __next__(self):
+        carte = self.paquet[self.position]
+        self.position += 1
+        return carte
+
+
+class Joueur:
+    def __init__(self, nom, stack):
+        self.nom = nom
+        self.stack = stack
+        self.jeu = []
+    
+    def __str__(self):
+        phrase1 = "{} possède un stack de {}.".format(self.nom, self.stack) + ' Il possède les cartes suivantes : '
+
+        for carte in self.jeu :
+            phrase1 += carte.__str__() + ', '
+            
+        return phrase1
+
+    def donnerCarte(self, carte):
+        self.jeu.append(carte)
+
+
+class Croupier(Joueur):
+    
+    def __init__(self, stack, nom = 'Croupier'):
+        self.nom = nom
+        self.stack = stack
+        self.jeu = []
+
+
+class Table():
+
+    def __init__(self, jeuDeCartes = JeuDeCartes(), joueurs={'Croupier' : Croupier(10000)}):
+        self.jeuDeCartes = jeuDeCartes
+        self.joueurs = joueurs
+    
+    def ajouterJoueur(self, nouveauJoueur):
+        self.joueurs[nouveauJoueur.nom] = nouveauJoueur
+        
+    def distribuerCartes(self, nbrDistribution):
+        c = 0
+        
+        while c < nbrDistribution :
+            for name, joueur in self.joueurs.items():
+                
+                carte = self.jeuDeCartes.__next__()
+                joueur.donnerCarte(carte)
+                
+            c += 1
+          
+            
+
+Table0 = Table()
+
+FX = Joueur('FX', 100)
+Angel = Joueur('Angel', 55)
+
+Table0.ajouterJoueur(FX)
+Table0.ajouterJoueur(Angel)
+
+Table0.distribuerCartes(2)
