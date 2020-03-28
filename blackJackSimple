@@ -1,0 +1,87 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Mar 28 17:35:50 2020
+
+@author: fxc
+"""
+
+import random
+
+def creationDeck():
+    deck = list()
+    for _ in range(4):
+        deck +=  range(1, 10)
+        deck += [10,10,10]
+        
+    random.shuffle(deck)
+    return deck
+
+
+def donnerCarte(deck):
+    return int(deck.pop())
+
+def Tour():
+    action = input('Hit or Stand ?S/H')
+    if action == 'H':
+        return True
+    elif action == 'S':
+        return False
+
+
+def analyseJeu(joueur):
+    if joueur > 21 :
+        return False
+    elif joueur <= 21:
+        return True
+    
+def issuePartie(joueur, croupier):
+    if joueur > 21:
+        return 'croupier'
+    elif croupier > 21:
+        return 'joueur'
+    elif joueur > croupier:
+        return 'joueur'
+    elif joueur == croupier:
+        return 'egalite'
+    elif croupier > joueur:
+        return 'croupier'
+
+deck = creationDeck()
+joueur = 0
+stack_joueur = 1000
+croupier = 0
+
+#distribution initiale :
+joueur = donnerCarte(deck) + donnerCarte(deck)
+croupier = donnerCarte(deck)
+print('le croupier a pour compte {}'.format(croupier))
+
+#mise = input('Mise = ')
+continuer = True
+alive = True
+while continuer == True:
+    print('Votre compte est de : {}'.format(joueur))
+    Choix = Tour()
+    if Choix == True :
+        carte = donnerCarte(deck)
+        print('Vous tirez la carte {}'.format(carte))
+        joueur += carte
+        print('Votre nouveau compte est {}'.format(joueur))
+        continuer = analyseJeu(joueur)
+        alive = False
+    elif Choix == False :
+        continuer = False
+        alive = True
+        
+
+if alive == True :
+    while croupier <= 17 :
+        carte = donnerCarte(deck)
+        print('Le croupier tire la carte {}'.format(carte))
+        croupier += carte
+        
+    print('Le croupier fait {}'.format(croupier))
+    
+
+print('Victoire de : {}'.format(issuePartie(joueur,croupier)))
