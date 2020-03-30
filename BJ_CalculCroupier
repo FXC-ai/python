@@ -16,42 +16,61 @@ def creationDeck():
     random.shuffle(deck)
     return deck
 
-deck = creationDeck()
 
+resume = list()
 
-hard_total = 0
-nb_As = 0
-resultats = list()
-
-i = 0
-while i < len(deck) :
-    #print('Avant de commencer i = ', i)
-    #print('Avant de commencer total = ', hard_total)
+for _ in range(1000) :
     
-    hard_total += deck[i]
-    #print('Total = ', hard_total)
+    deck = creationDeck()
     
-    if deck[i] == 11 :
-        nb_As += 1
-        #print('nb_as = ', nb_As)
+    #print(deck)
+    
+    #deck = [4, 11, 10, 10, 11, 4, 10, 8, 8, 10, 3, 6, 10, 7, 3, 10, 10, 5, 2, 9, 11, 2, 5, 10, 10, 10, 7, 10, 7, 8, 9, 2, 10, 6, 10, 7, 11, 8, 10, 2, 3, 5, 9, 6, 4, 9, 10, 6, 10, 4, 3, 5]
+    
+    hard_total = 0
+    nb_As = 0
+    resultats = list()
+    
+    i = 0
+    while i < len(deck) :
+        #print('Avant de commencer i = ', i)
+        #print('Avant de commencer total = ', hard_total)
         
-    if hard_total > 21 and nb_As == 0:
-        #print('Cas 1 : i = ', i)
-        hard_total -= deck[i]
-        #print('Cas 1 : total = ', hard_total)
-        resultats.append(hard_total)
-        hard_total = 0
-    elif hard_total > 21 and nb_As > 0:
-        i+=1
-        #print('Cas 2 : i = ', i)
-        nb_As -= 1
-        #print('Cas 2 nb_As = ', nb_As)
-        hard_total -= 10
-        #print('Cas 2 : total = ', hard_total)
-    elif hard_total <= 21 :
-        i+=1
-        #print('Cas 3 i = ', i)
+        hard_total += deck[i]
+        #print('Total = ', hard_total)
         
-    #print('\n')
+        if deck[i] == 11 :
+            nb_As += 1
+            #print('nb_as = ', nb_As)
+            
+        if hard_total > 21 and nb_As == 0:
+            #print('Cas 1 : i = ', i)
+            hard_total -= deck[i]
+            #print('Cas 1 : total = ', hard_total)
+            resultats.append((hard_total, i-1))
+            hard_total = 0
+        elif hard_total > 21 and nb_As > 0:
+            i+=1
+            #print('Cas 2 : i = ', i)
+            nb_As -= 1
+            #print('Cas 2 nb_As = ', nb_As)
+            hard_total -= 10
+            #print('Cas 2 : total = ', hard_total)
+        elif hard_total < 21 :
+            i+=1
+            #print('Cas 3 i = ', i)            
+        elif hard_total == 21 :
+            i+= 1
+            #print('Cas 4 i = ', i)
+            resultats.append((hard_total,i-1))
+            #print('total = ', hard_total)
+            hard_total = 0
+            #print('remise a 0 car 21 atteint', hard_total)
+            nb_As = 0
+            #print('annulation des as : nb As = ',nb_As)
 
-resultats.append(hard_total)
+            
+        #print('\n')
+    
+    resultats.append((hard_total,i-1))
+    resume.append(resultats)
