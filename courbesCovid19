@@ -1,0 +1,65 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Apr 14 21:03:21 2020
+
+@author: fxc
+"""
+import pandas as pd
+import matplotlib.pyplot as plt
+import math
+
+
+from urllib.request import urlopen
+url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv'
+with open('time_series_covid19_confirmed_global.csv', 'wb') as file:
+    file.write(urlopen(url).read())
+
+dataset_brut = pd.read_csv("time_series_covid19_confirmed_global.csv")
+
+dataset = dataset_brut.copy()
+
+del(dataset['Province/State'])
+del(dataset['Lat'])
+del(dataset['Long'])
+
+dataset_pays = dataset.groupby('Country/Region')
+
+df_corona = pd.DataFrame(index=[], columns=[])
+liste_pays = list()
+i = 0
+for df in dataset_pays :
+    liste_pays.append(df[0])
+    serie_a_ajouter = df[1].cumsum().iloc[-1,:]
+    df_corona[i] = serie_a_ajouter
+    i+=1
+    
+df_corona.columns = liste_pays
+df_corona = df_corona.drop(['Country/Region'])
+#dataset = dataset.set_index('Country/Region')
+
+def creerDiagramme(pays, datas):
+    
+    DATES_values = [date for date in datas.transpose()]
+    len(DATES_values)
+    
+    PAYS_values = datas[pays]
+    len(PAYS_values)
+    
+    ax = plt.axes()
+    plt.plot(DATES_values, PAYS_values, "o-", label="ligne -")
+    
+    for index in range(0,len(PAYS_values),3):
+        ax.annotate(PAYS_values[index], (DATES_values[index],PAYS_values[index]),rotation = math.fabs(90-index))
+            
+    plt.xticks(DATES_values, rotation = 90, fontsize = 8)
+    plt.grid(linestyle = '-', linewidth = 0.5)
+    plt.title('Statistiques du nombre de cas confirmés de corona virus pour le pays {}.'.format(pays))
+    plt.show()
+
+for index,pays in enumerate(liste_pays):
+   print('Indice = {}, Pays : {}.'.format(index,pays))
+    
+id_pays = int(input('Choix du pays :'))
+creerDiagramme(liste_pays[id_pays],df_corona)
+    
