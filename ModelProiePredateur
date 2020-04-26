@@ -1,0 +1,67 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Apr 24 12:19:32 2020
+
+@author: fxc
+"""
+
+import matplotlib.pyplot as plt
+
+nb_proie = 100
+delta_nb_proie = float()
+tx_reproduction_proies = 0.1
+tx_mortalité_proies = 0.1 #dû aux prédateurs
+list_nb_proies = list()
+list_nb_proies.append(nb_proie)
+
+nb_predateur = 25
+delta_nb_predateur = float()
+tx_reproduction_predateurs = 0.1 #dû aux proies
+tx_mortalité_predateurs = 0.1
+list_nb_predateurs = list()
+list_nb_predateurs.append(nb_predateur)
+
+t = 0
+t_max = 50
+
+
+while t < t_max :
+    
+    if nb_proie > 1:
+        delta_nb_proie = tx_reproduction_proies*nb_proie - tx_mortalité_proies*nb_predateur
+    else :
+        delta_nb_proie = 0
+    if nb_predateur > 1:
+        delta_nb_predateur = tx_reproduction_predateurs*nb_proie - tx_mortalité_predateurs*nb_predateur
+    else :
+        delta_nb_predateur = 0
+    
+    
+    nb_proie += (delta_nb_proie)
+    nb_proie = 0 if nb_proie<=0 else nb_proie
+   
+    nb_predateur += (delta_nb_predateur)
+    nb_predateur = 0 if nb_predateur<=0 else nb_predateur
+    t+=1
+    
+    list_nb_proies.append(nb_proie)
+    list_nb_predateurs.append(nb_predateur)
+    
+t_values = [ _ for _ in range(t_max + 1)]
+        
+ax = plt.axes()
+plt.plot(t_values, list_nb_predateurs, "o-", label="Population prédateurs")
+plt.plot(t_values, list_nb_proies, "o-", label="Populations proies")
+plt.legend()
+plt.figtext(0,0.1, 'PARAMETRES :\nPrédateurs :\n   tx_reproduction= {}\n   tx_mortalité= {}\nProies :\n   tx_reproduction= {}\n   tx_mortalité={}  '.format(tx_reproduction_predateurs, tx_mortalité_predateurs, tx_reproduction_proies, tx_mortalité_proies), size = 'large')
+  
+for index in range(0,t_max,5):
+    ax.annotate(round(list_nb_predateurs[index]), (t_values[index],list_nb_predateurs[index]),rotation = 30)
+    ax.annotate(round(list_nb_proies[index]), (t_values[index],list_nb_proies[index]),rotation = 30)
+         
+#plt.xticks(DATES_values, rotation = 90, fontsize = 8)
+plt.grid(linestyle = '-', linewidth = 0.5)
+plt.title('Evolution des populations de proies et de prédateurs sur {} jours.'.format(t_max))
+plt.show()
+
