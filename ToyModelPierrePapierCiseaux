@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Apr 16 19:44:40 2020
+
+@author: fxc
+"""
+
+
+import pandas as pd
+import numpy as np
+
+# Import data
+dataset = pd.read_csv('data/PierrePapierCiseaux.csv')
+dataset = dataset.sample(frac=1).reset_index(drop=True)
+dataset.columns = [0,1,2,3,4,5]
+x = dataset.loc[:,0:2]
+y = dataset.loc[:,3:5]
+
+#to_numpy est une fonction des dataframe de pandas
+y = y.to_numpy()
+x = x.to_numpy()
+
+from keras.models import Sequential
+from keras.models import load_model
+from keras.layers import Dense
+
+PierrePapierCiseaux = Sequential()
+
+PierrePapierCiseaux.add(Dense(units = 3, kernel_initializer = 'uniform', activation = 'relu', input_dim = 3))
+
+PierrePapierCiseaux.add(Dense(units = 3, kernel_initializer = 'uniform', activation = 'sigmoid'))
+
+PierrePapierCiseaux.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
+
+weight_before = PierrePapierCiseaux.get_weights()
+
+PierrePapierCiseaux.fit(x, y, batch_size = 1, epochs = 15)
+
+weight_after = PierrePapierCiseaux.get_weights()
+
+PierrePapierCiseaux.layers[0].get_weights()
+PierrePapierCiseaux.layers[1].get_weights()
+
+PierrePapierCiseaux.predict(np.array([[1,1,0]]))
+
+#print(PierrePapierCiseaux.layers)
+
+#PierrePapierCiseaux.save('PPC_accu_1V2.h5')
+
+#modele1 = load_model('PPC_accu_1.h5')
+
+#modele1.layers[0].get_weights()
