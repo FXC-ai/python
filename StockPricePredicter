@@ -1,0 +1,157 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sat May  9 16:00:46 2020
+
+@author: fxc
+"""
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import math
+import pickle
+
+import keras.models
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.layers import LSTM
+from keras.layers import Dropout
+
+from sklearn.preprocessing import MinMaxScaler
+
+
+
+class Stock_Price_Object :
+    
+    def __init__(self, filename):
+        self.company = filename
+        self.dataset = pd.read_csv(filename + '.csv')
+        self.dataset_dates = self.dataset.iloc[:,0]
+        self.dataset_open = self.dataset.iloc[:,1]
+        
+        self.dataset_train = self.dataset.loc[:len(self.dataset) - 21].iloc[:,1:2].values 
+        #Il faudrat ajouter des features ici
+        
+        self.dataset_test = self.dataset.loc[len(self.dataset)-80 :].iloc[:,1:2].values
+        
+        self.MMScaler = MinMaxScaler()
+        
+        self.dataset_train_scaled = self.standardisation(self.dataset_train)
+        
+        self.training_set_x, self.training_set_y = self.TimeSteps_Matrix(self.dataset_train_scaled)
+        
+        self.modele = self.createRNN(self.training_set_x)
+        
+        self.price_prediction_test = ''
+        
+        
+    def standardisation(self, datas):   
+        self.MMScaler.fit_transform(self.dataset.iloc[:,1:2])
+        return self.MMScaler.transform(datas)
+    
+    def TimeSteps_Matrix(self, datas):
+        x = []
+        y = []
+        TimeSteps = 60
+        #fonction à modifier pour ajouter des features ????
+        #si ça peut aider la premiere valeur de y est la derniere valeur de la deuxieme couche de x
+        for i in range(TimeSteps, len(datas)):
+            x.append(datas[i-TimeSteps:i, 0])#ça ne prends pas le i
+            y.append(datas[i,0])
+            
+        x, y = np.array(x), np.array(y)
+            
+        return np.reshape(x, (x.shape[0], x.shape[1], 1)), y
+    
+    def createRNN(self, datas):
+                
+        regressor = Sequential()
+        regressor.add(LSTM(units = 50, return_sequences = True, input_shape = (datas.shape[1], datas.shape[2])))
+        regressor.add(Dropout(0.2))
+
+        regressor.add(LSTM(units = 50, return_sequences = True))
+        regressor.add(Dropout(0.2))
+
+        regressor.add(LSTM(units = 50, return_sequences = True))
+        regressor.add(Dropout(0.2))
+
+        regressor.add(LSTM(units = 50))
+        regressor.add(Dropout(0.2))
+
+        regressor.add(Dense(units = 1))
+
+        regressor.compile(optimizer = 'adam', loss = 'mean_squared_error')        
+        
+        return regressor
+    
+    
+    def trainRNN(self):
+        self.modele.fit(self.training_set_x, self.training_set_y, verbose = 1 ,epochs = 100, batch_size = 32)
+        
+    def predictStockPrice(self):
+        
+        inputs = self.dataset_open[len(self.dataset_open)-60:]
+        inputs = np.array(inputs)
+        inputs = inputs.reshape(60,1)
+        
+        inputs = self.MMScaler.transform(inputs)
+        
+        inputs = inputs.reshape(1,60,1)
+        price_prediction = self.modele.predict(inputs)
+        price_prediction = self.MMScaler.inverse_transform(price_prediction)
+        print('Prediction au --/--/-- : {}$'.format(math.ceil(price_prediction[0][0])))
+        return price_prediction
+    
+    def evaluateModel(self):
+                
+        borne_sup = self.dataset_test.shape[0] - 60
+        
+        dates = self.dataset_dates.loc[len(self.dataset_dates) - borne_sup:]
+        
+        inputs_x = []
+        for i in range(0, borne_sup):
+            inputs_x.append(self.MMScaler.transform(self.dataset_test[i:i+60]))
+        
+        inputs_x = np.array(inputs_x)
+        
+        price_prediction_test = self.modele.predict(inputs_x)
+        price_prediction_test = self.MMScaler.inverse_transform(price_prediction_test)
+        
+        self.price_prediction_test = price_prediction_test
+        
+        return dates, price_prediction_test, self.dataset_test[60:]
+        
+        
+        
+    def creerGraphique(self, dates, real_price, price_prediction_test):
+          
+       plt.plot(dates, real_price, "-o", label = "Prix réel")
+       plt.plot(dates, price_prediction_test, "-o", label = "Prix estimé la veille")
+       plt.grid(linestyle = '-', linewidth = 0.5)
+       plt.xticks(dates, rotation = 90, fontsize = 12)
+       plt.title('{} Stock Price Prediction'.format(self.company))
+       plt.legend()
+       plt.show()
+       
+    
+    def saveModel(self,file_name):
+        self.modele.save(file_name+'.h5')
+    
+    def loadModel(self, file_name):
+        self.modele =  keras.models.load_model(file_name + '.h5')
+        
+
+SPO = Stock_Price_Object('FB')
+
+#SPO.trainRNN()
+#SPO.saveModel('experimentation')
+SPO.loadModel('experimentation')
+
+
+dates, price_prediction_test, real_price = SPO.evaluateModel()
+
+SPO.creerGraphique(dates, real_price, price_prediction_test)
+
+unique_price_prediction = SPO.predictStockPrice()
