@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sat May 23 17:53:21 2020
+
+@author: fxc
+"""
+
+import pandas as pd
+import os
+
+dataset = pd.read_csv('Zstups2.csv')
+dataset.fillna('#', inplace=True)
+
+
+for l in range(len(dataset)):
+    stupefiant = str(dataset.iloc[l][0]) +' '+ str(dataset.iloc[l][1]) +' ' + str(dataset.iloc[l][2])
+    stupefiant = stupefiant.replace('µ','micro')
+    stupefiant = stupefiant.replace('%', 'pour cent')
+    stupefiant = stupefiant.replace('#', '')
+    name_file  = stupefiant.replace(' ', '').replace('/','').replace('.','').replace('*','').replace(':','')
+        
+    s_package = '\\documentclass{report}\\usepackage[utf8]{inputenc}\\usepackage[T1]{fontenc}\\usepackage[francais]{babel}\\usepackage[top=1cm, bottom=1cm, left=0cm, right=0.5cm]{geometry}\\usepackage{array}'
+    s_contenu = '\\begin{document}\\pagestyle{empty}\\begin{center}\\huge{\\textbf{'+stupefiant+'}}\\end{center}\\centering\\begin{tabular}{|m{1.1cm}|m{4cm}|m{4.3cm}|m{4cm}|m{0.6cm}|m{0.6cm}|m{0.6cm}|m{0.8cm}|}\\hline\\textbf{Date}&\\textbf{Nom du patient / Fournisseur}&\\textbf{Numéro d\'ordonnance + Numéro d\'ordonnancier OU Numéro de bulletin}&\\textbf{Nom du médecin}&\\textbf{Ent.}&\\textbf{Sor.}&\\textbf{Sto.}&\\textbf{Visa}\\\\\\hline &Solde au  &&&&&&\\rule[-8pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline&&&&&&&\\rule[-7pt]{0pt}{20pt}\\\\\\hline\\end{tabular}\n\\flushright{Document QMS Pharmacie BENU - Gestion Stupéfiants}\n\\end{document}'
+    s = s_package + s_contenu
+    
+    with open(name_file +'.tex', 'w') as file :
+        file.write(s)
+    
+    os.system("pdflatex "+ name_file+'.tex')
+    
+    
+  
+list_file = os.listdir()
+
+for file in list_file:
+    if file[-3:] == 'log' or file[-3:] == 'aux' or file[-3:] == 'tex':
+        os.remove(file)
