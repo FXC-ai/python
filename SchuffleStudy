@@ -1,0 +1,118 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Apr 26 11:40:12 2020
+
+@author: fxc
+"""
+import tkinter as tk
+import matplotlib.pyplot as plt
+
+def shuffleChips (nbr_chips):
+
+    pileDroite_ini = ['blue' for _ in range(nbr_chips)]
+    pileGauche_ini = ['green' for _ in range(nbr_chips)]
+    list_pile = list()
+    
+    c = 0
+    
+    list_pile.append((pileGauche_ini,pileDroite_ini))
+    pileDroite = list(pileDroite_ini)
+    pileGauche = list(pileGauche_ini)
+    pileInterm = []
+ 
+    continuer = True
+    while (continuer == True):
+        for i in range(nbr_chips):
+            pileInterm.append(pileDroite[i])
+            pileInterm.append(pileGauche[i])
+        
+        c+=1
+        pileGauche = pileInterm[:nbr_chips]
+        pileDroite = pileInterm[nbr_chips:]
+        
+        list_pile.append((pileGauche,pileDroite))
+        
+        pileInterm = []
+        
+        
+        if pileDroite == pileDroite_ini and pileGauche == pileGauche_ini :
+            continuer = False
+    
+    print(nbr_chips, ' ', c)
+    return list_pile, c 
+
+def creerDiagramme(nbr_chips, list_nbr_iterations):
+    
+    x = [ _ for _ in range(nbr_chips)]
+       
+    ax = plt.axes()
+    plt.plot(x, list_nbr_iterations, "o-", label="ligne -")
+    
+    
+    for index in range(0,len(list_nbr_iterations),3):
+        ax.annotate(list_nbr_iterations[index], (x[index],list_nbr_iterations[index]),rotation = 10)
+    
+      
+    plt.xticks(x, rotation = 90, fontsize = 8)
+    plt.grid(linestyle = '-', linewidth = 0.5)
+    plt.title('Nombre de mélange nécessaire en fonction du nombre de chips.')
+    plt.show()
+    
+
+# Représentation graphique
+
+def representerGraphe(list_pile):
+    fenetre = tk.Tk()
+    label = tk.Label(fenetre, text="Schuffle World")
+    label.pack()
+    
+    canvas = tk.Canvas(fenetre, width=2000, height=1000, background = "white")
+    canvas.pack()
+    
+    hauteur = 40
+    largeur = 100
+    
+    i0 = 0
+    while i0 < len(list_pile):
+        i = 0
+        while i < len(list_pile[0][0]) :
+            y1 = 900
+            x1 = 0
+            y1 = y1-(hauteur*i)
+            x1 = x1+(((2*largeur+3)*i0))
+            canvas.create_rectangle(x1,y1,x1+largeur,y1+hauteur, outline = "black", fill = list_pile[i0][0][i])
+            canvas.create_rectangle(x1+largeur,y1,x1+2*largeur,y1+hauteur, outline = "black", fill = list_pile[i0][1][i])
+            i+= 1
+        i0+=1
+    
+    
+    fenetre.mainloop()
+
+
+nbr_chips = 200
+# Analyse
+
+list_nbr_iterations = list()
+
+for k in range(nbr_chips):
+    list_pile, c = shuffleChips(k)
+    list_nbr_iterations.append(c)
+    
+creerDiagramme(nbr_chips, list_nbr_iterations)
+
+#Représenter graphe
+'''
+list_pile = []    
+list_pile, c = shuffleChips(4)
+representerGraphe(list_pile)
+'''
+
+'''
+import pickle as pk
+
+pk.dump(list_nbr_iterations,open('listeSchuffle', 'wb'))
+
+test = pk.load(open('listeSchuffle','rb'))
+test[5]
+'''
